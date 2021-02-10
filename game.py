@@ -2,12 +2,15 @@ import time
 import itertools
 
 class Game:
-    def __init__(self, client, start_channel, guild, time_limit):
+    def __init__(self, client, comm_channel, start_channel, guild, time_limit):
         self.client = client
+        self.comm_channel = comm_channel
         self.start_channel = start_channel
         self.guild = guild
         self.time_limit = time_limit
         self.players = []
+        self.text_channels = []
+        self.voice_channels = []
     
     def add_player(self, player):
         self.players.append(player)
@@ -24,7 +27,7 @@ class Game:
             await y.move_to(vc)
         except Exception as e:
             print(e)
-            await self.start_channel.send('Internal server error...')
+            await self.comm_channel.send('Internal server error...')
             return
 
     def all_pairs(self, lst):
@@ -51,27 +54,23 @@ class Game:
                     }
                 )
                 j += 1
+            k += 1
         
-        return result
-        
-
-        
+        return result   
 
     async def start(self):
-        text_channels = []
-        voice_channels = []
 
         for i in range(len(self.players) // 2):
             tc = await self.guild.create_text_channel('speed-date-room-' + str(i))
-            text_channels.append(tc)
+            self.text_channels.append(tc)
             
             vc = await self.guild.create_voice_channel('speed-date-room-' + str(i))
-            voice_channels.append(vc)
+            self.voice_channels.append(vc)
         
-        pairings = self.generate_pairings(voice_channels)
+        pairings = self.generate_pairings(self.voice_channels)
 
         counter = 0
-        round_no = 0
+        round_no = 1
         queue = []
         for p in pairings:
             await self.start_date(p['pairing'][0], p['pairing'][1], p['voice_channel'])
@@ -80,8 +79,8 @@ class Game:
             counter += 1
 
             if counter == 2:
-                await self.start_channel.send('Starting round {}!'.format(round_no))
-                await self.start_channel.send(
+                await self.comm_channel.send('Starting round {}!'.format(round_no))
+                await self.comm_channel.send(
                     ''.join(
                         [
                             'Voice channel: {} - {} & {}\n'.format(
@@ -90,11 +89,35 @@ class Game:
                         ]
                     )
                 )
+
                 time.sleep((self.time_limit - 1) * 60)
-                await self.start_channel.send('1 minute remaining until next swap!')
+                await self.comm_channel.send('1 minute remaining until next swap!')
                 time.sleep(60)
                 counter = 0
                 queue = []
+                round_no += 1
+        
+        await self.comm_channel.send('Speed date event is now over! Thank you for participating :)')
+        await self.clear_and_exit()
+        return
 
         
+    async def clear_and_exit(self):
+        for player in self.players:
+            try:
+                await player.move_to(self.start_channel)
+            except Exception as e:
+                print(e)
+                await self.comm_channel.send('Internal server error...')
         
+        for tc in self.text_channels:
+            try:
+                await tc.delete()
+            except Exception as e:
+                print(e)
+        
+        for vc in self.voice_channels:
+            try:
+                await vc.delete()
+            except Exception as e:
+                print(e)

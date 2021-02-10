@@ -4,7 +4,7 @@ from bot import Bot
 import discord
 
 load_dotenv()
-CLIENT_TOKEN = os.getenv('TEST_TOKEN_3')
+CLIENT_TOKEN = os.getenv('TEST_TOKEN')
 
 def main():
     client = discord.Client()

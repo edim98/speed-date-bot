@@ -41,10 +41,13 @@ class Bot:
             # !start <channel_name> <time_limit>
             params = message.content.split()[1:]
             guild = message.guild
+            start_channel = None
 
             if params[0] not in [str(vc) for vc in guild.voice_channels]:
                 await message.channel.send('There is no {} voice channel in the {} server! Please try again...'.format(params[0], str(guild)))
                 return
+            else:
+                start_channel = [vc for vc in guild.voice_channels if str(vc) == params[0]][0]
             
             try:
                 max_room_time = int(params[1])
@@ -52,7 +55,7 @@ class Bot:
                 await message.channel.send('Max room size and max room time need to be integer numbers! Please try again...')
                 return
             else:
-                game = Game(self.client, message.channel, guild, max_room_time)
+                game = Game(self.client, message.channel, start_channel, guild, max_room_time)
 
                 current_voice_states = [channel.voice_states for channel in message.guild.voice_channels if str(channel) == params[0]][0]
                 
@@ -63,6 +66,7 @@ class Bot:
                 self.games_queue.append(game)
                 await game.start()
                 self.games_queue.pop()
+
 
 
 
