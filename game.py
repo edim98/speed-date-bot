@@ -60,7 +60,9 @@ class Game:
 
     async def start(self):
 
-        for i in range(len(self.players) // 2):
+        no_rooms = len(self.players) // 2
+
+        for i in range(no_rooms):
             tc = await self.guild.create_text_channel('speed-date-room-' + str(i))
             self.text_channels.append(tc)
             
@@ -78,7 +80,7 @@ class Game:
 
             counter += 1
 
-            if counter == 2:
+            if counter == no_rooms:
                 await self.comm_channel.send('Starting round {}!'.format(round_no))
                 await self.comm_channel.send(
                     ''.join(
@@ -92,11 +94,11 @@ class Game:
 
                 time.sleep((self.time_limit - 1) * 60)
 
-                self.send_to_all(60)
+                await self.send_to_all(60)
                 time.sleep(30)
-                self.send_to_all(30)
+                await self.send_to_all(30)
                 time.sleep(20)
-                self.send_to_all(10)
+                await self.send_to_all(10)
                 time.sleep(10)
 
                 counter = 0

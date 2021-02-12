@@ -1,5 +1,6 @@
 import discord
 from game import Game
+import asyncio
 
 class Bot:
     def __init__(self, token):
@@ -17,6 +18,7 @@ class Bot:
                 return
             if not self.authorize(message):
                 return
+            
             await self.parse(message)
 
     def run(self):
@@ -66,7 +68,9 @@ class Bot:
                     game.add_player(member)
                 
                 self.games_queue.append(game)
+
                 await game.start()
+
                 self.games_queue.pop()
 
 

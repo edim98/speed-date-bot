@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 import os
 from bot import Bot
+import asyncio
 
 load_dotenv()
 CLIENT_TOKEN = os.getenv('TOKEN')
