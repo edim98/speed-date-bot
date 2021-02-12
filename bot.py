@@ -30,12 +30,12 @@ class Bot:
     
     async def parse(self, message):
         if message.content == '!help':
-            print('haha')
             await message.channel.send('hElP')
         
         if message.content.startswith('!start'):
             if self.games_queue:
-                await message.channel.send('A game is already running!')
+                # await message.channel.send('A game is already running!')
+                await message.author.send('A game is already running!')
                 return
 
             # !start <channel_name> <time_limit>
@@ -44,7 +44,8 @@ class Bot:
             start_channel = None
 
             if params[0] not in [str(vc) for vc in guild.voice_channels]:
-                await message.channel.send('There is no {} voice channel in the {} server! Please try again...'.format(params[0], str(guild)))
+                # await message.channel.send('There is no {} voice channel in the {} server! Please try again...'.format(params[0], str(guild)))
+                await message.author.send('There is no {} voice channel in the {} server! Please try again...'.format(params[0], str(guild)))
                 return
             else:
                 start_channel = [vc for vc in guild.voice_channels if str(vc) == params[0]][0]
@@ -52,10 +53,11 @@ class Bot:
             try:
                 max_room_time = int(params[1])
             except:
-                await message.channel.send('Max room size and max room time need to be integer numbers! Please try again...')
+                # await message.channel.send('Max room size and max room time need to be integer numbers! Please try again...')
+                await message.author.send('Max room size and max room time need to be integer numbers! Please try again...')
                 return
             else:
-                game = Game(self.client, message.channel, start_channel, guild, max_room_time)
+                game = Game(self.client, message.author, start_channel, guild, max_room_time)
 
                 current_voice_states = [channel.voice_states for channel in message.guild.voice_channels if str(channel) == params[0]][0]
                 

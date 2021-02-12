@@ -3,4 +3,5 @@ Discord Speed Date Bot
 
 # TODO's:
 - prettier messages
-- countdown message in each room textchat
+- pause at 30 min mark
+- OPTIONAL: pause whenever

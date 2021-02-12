@@ -91,13 +91,20 @@ class Game:
                 )
 
                 time.sleep((self.time_limit - 1) * 60)
-                await self.comm_channel.send('1 minute remaining until next swap!')
-                time.sleep(60)
+
+                self.send_to_all(60)
+                time.sleep(30)
+                self.send_to_all(30)
+                time.sleep(20)
+                self.send_to_all(10)
+                time.sleep(10)
+
                 counter = 0
                 queue = []
                 round_no += 1
         
-        await self.comm_channel.send('Speed date event is now over! Thank you for participating :)')
+        await self.comm_channel.send('Speed date event is now over! You will be returned to the original voice channel in a couple of seconds... Thank you for participating :)')
+        time.sleep(5)
         await self.clear_and_exit()
         return
 
@@ -121,3 +128,8 @@ class Game:
                 await vc.delete()
             except Exception as e:
                 print(e)
+
+    async def send_to_all(self, timer):
+        await self.comm_channel.send('{} seconds remaining until next round!'.format(timer))
+        for tc in self.text_channels:
+            tc.send('{} seconds remaining until next round!'.format(timer))
