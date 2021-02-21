@@ -1,5 +1,6 @@
 import time
 import itertools
+import asyncio
 
 class Game:
     def __init__(self, client, comm_channel, start_channel, guild, time_limit):
@@ -11,6 +12,14 @@ class Game:
         self.players = []
         self.text_channels = []
         self.voice_channels = []
+        self.pause_flag = False
+    
+    async def set_pause(self):
+        if self.pause_flag:
+            await self.comm_channel.send('Game was unpaused!')
+        else:
+            await self.comm_channel.send('Game was paused!')
+        self.pause_flag = not self.pause_flag
     
     def add_player(self, player):
         self.players.append(player)
@@ -20,6 +29,11 @@ class Game:
     
     def get_players(self):
         return self.players
+    
+    async def pause(self):
+        while self.pause_flag:
+            await asyncio.sleep(0.25)
+        return
 
     async def start_date(self, x, y, vc):
         try: 
@@ -92,21 +106,30 @@ class Game:
                     )
                 )
 
-                time.sleep((self.time_limit - 1) * 60)
+                # await asyncio.sleep((self.time_limit - 1) * 60)
+                await self.wait_until((self.time_limit - 1) * 60)
 
                 await self.send_to_all(60)
-                time.sleep(30)
+
+                # await asyncio.sleep(30)
+                await self.wait_until(30)
+
                 await self.send_to_all(30)
-                time.sleep(20)
+
+                # await asyncio.sleep(20)
+                await self.wait_until(20)
+
                 await self.send_to_all(10)
-                time.sleep(10)
+
+                # await asyncio.sleep(10)
+                await self.wait_until(10)
 
                 counter = 0
                 queue = []
                 round_no += 1
         
-        await self.comm_channel.send('Speed date event is now over! You will be returned to the original voice channel in a couple of seconds... Thank you for participating :)')
-        time.sleep(5)
+        await self.send_to_all('Speed date event is now over! You will be returned to the original voice channel in a couple of seconds... Thank you for participating :)')
+        await asyncio.sleep(5)
         await self.clear_and_exit()
         return
 
@@ -134,4 +157,13 @@ class Game:
     async def send_to_all(self, timer):
         await self.comm_channel.send('{} seconds remaining until next round!'.format(timer))
         for tc in self.text_channels:
-            tc.send('{} seconds remaining until next round!'.format(timer))
+            await tc.send('{} seconds remaining until next round!'.format(timer))
+
+    async def wait_until(self, timeout, period=0.25):
+        must_end = time.time() + timeout
+        while time.time() < must_end:
+            if self.pause_flag:
+                still_to_wait = must_end - time.time()
+                await self.pause()
+                must_end = time.time() + still_to_wait
+            await asyncio.sleep(period)

@@ -6,7 +6,7 @@ class Bot:
     def __init__(self, token):
         self.client = discord.Client()
         self.token = token
-        self.games_queue = []
+        self.running_game = None
 
         @self.client.event
         async def on_ready():
@@ -35,8 +35,7 @@ class Bot:
             await message.channel.send('hElP')
         
         if message.content.startswith('!start'):
-            if self.games_queue:
-                # await message.channel.send('A game is already running!')
+            if self.running_game:
                 await message.author.send('A game is already running!')
                 return
 
@@ -46,7 +45,6 @@ class Bot:
             start_channel = None
 
             if params[0] not in [str(vc) for vc in guild.voice_channels]:
-                # await message.channel.send('There is no {} voice channel in the {} server! Please try again...'.format(params[0], str(guild)))
                 await message.author.send('There is no {} voice channel in the {} server! Please try again...'.format(params[0], str(guild)))
                 return
             else:
@@ -55,7 +53,6 @@ class Bot:
             try:
                 max_room_time = int(params[1])
             except:
-                # await message.channel.send('Max room size and max room time need to be integer numbers! Please try again...')
                 await message.author.send('Max room size and max room time need to be integer numbers! Please try again...')
                 return
             else:
@@ -67,11 +64,20 @@ class Bot:
                     member = await guild.fetch_member(k)
                     game.add_player(member)
                 
-                self.games_queue.append(game)
+                self.running_game = game
 
                 await game.start()
 
-                self.games_queue.pop()
+                self.running_game = None
+        
+        if message.content == '!pause':
+            if self.running_game:
+                await self.running_game.set_pause()
+            else:    
+                await message.author.send('There is no running game to be paused!')
+            
+            
+
 
 
 
