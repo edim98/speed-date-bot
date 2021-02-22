@@ -47,7 +47,7 @@ class Game:
             print(e)
             await self.comm_channel.send('Internal server error...')
 
-    def all_pairs(lst): 
+    def all_pairs(self, lst): 
         pairings = []
         n = len(lst)
         labels = {
@@ -120,17 +120,17 @@ class Game:
                 # await asyncio.sleep((self.time_limit - 1) * 60)
                 await self.wait_until((self.time_limit - 1) * 60)
 
-                await self.send_to_all(60)
+                await self.send_to_all(60, round_no)
 
                 # await asyncio.sleep(30)
                 await self.wait_until(30)
 
-                await self.send_to_all(30)
+                await self.send_to_all(30, round_no)
 
                 # await asyncio.sleep(20)
                 await self.wait_until(20)
 
-                await self.send_to_all(10)
+                await self.send_to_all(10, round_no)
 
                 # await asyncio.sleep(10)
                 await self.wait_until(10)
@@ -139,13 +139,15 @@ class Game:
                 queue = []
                 round_no += 1
         
-        await self.send_to_all('Speed date event is now over! You will be returned to the original voice channel in a couple of seconds... Thank you for participating :)')
-        await asyncio.sleep(5)
         await self.clear_and_exit()
         return
 
         
     async def clear_and_exit(self):
+        for tc in self.text_channels:
+            await tc.send('Speed date event is now over! You will be returned to the original voice channel in a couple of seconds... Thank you for participating :)')
+        await asyncio.sleep(5)
+
         for player in self.players:
             try:
                 await player.move_to(self.start_channel)
@@ -165,10 +167,10 @@ class Game:
             except Exception as e:
                 print(e)
 
-    async def send_to_all(self, timer):
-        await self.comm_channel.send('{} seconds remaining until next round!'.format(timer))
+    async def send_to_all(self, timer, round_no):
+        await self.comm_channel.send('{} seconds remaining until round {}!'.format(timer, round_no))
         for tc in self.text_channels:
-            await tc.send('{} seconds remaining until next round!'.format(timer))
+            await tc.send('{} seconds remaining until round {}!'.format(timer, round_no))
 
     async def wait_until(self, timeout, period=0.25):
         must_end = time.time() + timeout

@@ -46,10 +46,11 @@ def all_pairs(lst):
         pairings[i].append((labels['inf'], labels[i]))
         for k in range(1, n//2):
             pairings[i].append((labels[(i + k) % (n - 1)], labels[(i - k) % (n - 1)]))
-    
     return pairings
 
 
 if __name__ == "__main__":
     # main()
-    print(all_pairs([1,2,3,4, 5, 6]))
+    x = all_pairs([1,2,3,4, 5, 6, 7, 8, 9, 10])
+    print(x)
+    print(len(x) == 9)
