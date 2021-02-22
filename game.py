@@ -1,5 +1,4 @@
 import time
-import itertools
 import asyncio
 
 class Game:
@@ -38,21 +37,32 @@ class Game:
     async def start_date(self, x, y, vc):
         try: 
             await x.move_to(vc)
+        except Exception as e:
+            print(e)
+            await self.comm_channel.send('Internal server error...')
+
+        try:
             await y.move_to(vc)
         except Exception as e:
             print(e)
             await self.comm_channel.send('Internal server error...')
-            return
 
-    def all_pairs(self, lst):
-        if len(lst) < 2:
-            yield []
-            return
-        a = lst[0]
-        for i in range(1, len(lst)):
-            pair = (a, lst[i])
-            for rest in self.all_pairs(lst[1:i] + lst[i+1:]):
-                yield [pair] + rest
+    def all_pairs(lst): 
+        pairings = []
+        n = len(lst)
+        labels = {
+            "inf": lst[0]
+        }
+        for i in range(n - 1):
+            labels[i] = lst[i + 1]
+            pairings.append([])
+
+        for i in range(n - 1):
+            pairings[i].append((labels['inf'], labels[i]))
+            for k in range(1, n//2):
+                pairings[i].append((labels[(i + k) % (n - 1)], labels[(i - k) % (n - 1)]))
+        
+        return pairings
 
     def generate_pairings(self, voice_channels):
         result = []
@@ -84,6 +94,7 @@ class Game:
             self.voice_channels.append(vc)
         
         pairings = self.generate_pairings(self.voice_channels)
+        print(pairings)
 
         counter = 0
         round_no = 1

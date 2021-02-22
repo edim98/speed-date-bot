@@ -4,7 +4,7 @@ from bot import Bot
 import discord
 
 load_dotenv()
-CLIENT_TOKEN = os.getenv('TEST_TOKEN_3')
+CLIENT_TOKEN = os.getenv('TEST_TOKEN_2')
 
 def main():
     client = discord.Client()
@@ -32,5 +32,24 @@ def main():
 
     client.run(CLIENT_TOKEN)
 
+def all_pairs(lst): 
+    pairings = []
+    n = len(lst)
+    labels = {
+        "inf": lst[0]
+    }
+    for i in range(n - 1):
+        labels[i] = lst[i + 1]
+        pairings.append([])
+
+    for i in range(n - 1):
+        pairings[i].append((labels['inf'], labels[i]))
+        for k in range(1, n//2):
+            pairings[i].append((labels[(i + k) % (n - 1)], labels[(i - k) % (n - 1)]))
+    
+    return pairings
+
+
 if __name__ == "__main__":
-    main()
+    # main()
+    print(all_pairs([1,2,3,4, 5, 6]))
