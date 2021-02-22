@@ -2,11 +2,14 @@ from dotenv import load_dotenv
 import os
 from bot import Bot
 import discord
+import sys
 
 load_dotenv()
-CLIENT_TOKEN = os.getenv('TEST_TOKEN_2')
+# CLIENT_TOKEN = os.getenv('TEST_TOKEN_2')
 
 def main():
+    CLIENT_TOKEN = sys.argv[1]
+
     client = discord.Client()
 
     @client.event
@@ -50,7 +53,4 @@ def all_pairs(lst):
 
 
 if __name__ == "__main__":
-    # main()
-    x = all_pairs([1,2,3,4, 5, 6, 7, 8, 9, 10])
-    print(x)
-    print(len(x) == 9)
+    main()

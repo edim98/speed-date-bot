@@ -94,7 +94,6 @@ class Game:
             self.voice_channels.append(vc)
         
         pairings = self.generate_pairings(self.voice_channels)
-        print(pairings)
 
         counter = 0
         round_no = 1
@@ -110,29 +109,25 @@ class Game:
                 await self.comm_channel.send(
                     ''.join(
                         [
-                            'Voice channel: {} - {} & {}\n'.format(
+                            'Voice channel: {} - {}\t&\t{}\n'.format(
                                 q['voice_channel'], q['pairing'][0], q['pairing'][1]
                             ) for q in queue
                         ]
                     )
                 )
 
-                # await asyncio.sleep((self.time_limit - 1) * 60)
                 await self.wait_until((self.time_limit - 1) * 60)
 
                 await self.send_to_all(60, round_no)
 
-                # await asyncio.sleep(30)
                 await self.wait_until(30)
 
                 await self.send_to_all(30, round_no)
 
-                # await asyncio.sleep(20)
                 await self.wait_until(20)
 
                 await self.send_to_all(10, round_no)
 
-                # await asyncio.sleep(10)
                 await self.wait_until(10)
 
                 counter = 0
