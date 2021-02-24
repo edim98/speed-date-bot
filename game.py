@@ -86,11 +86,16 @@ class Game:
 
         no_rooms = len(self.players) // 2
 
+        # categories = self.guild.categories
+        # dating_category = [c for c in categories if str(c) == '------Speed Dating ---------'][0]
+
         for i in range(no_rooms):
-            tc = await self.guild.create_text_channel('speed-date-room-' + str(i))
+            # tc = await self.guild.create_text_channel('speed-date-room-' + str(i), category = dating_category)
+            tc = await self.guild.create_text_channel('speed-date-room' + str(i))
             self.text_channels.append(tc)
             
-            vc = await self.guild.create_voice_channel('speed-date-room-' + str(i))
+            # vc = await self.guild.create_voice_channel('speed-date-room-' + str(i), category = dating_category)
+            vc = await self.guild.create_voice_channel('speed-date-room' + str(i))
             self.voice_channels.append(vc)
         
         pairings = self.generate_pairings(self.voice_channels)

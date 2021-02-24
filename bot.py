@@ -25,7 +25,7 @@ class Bot:
         self.client.run(self.token)
 
     def authorize(self, message):
-        if "admin" not in [str(role) for role in message.author.roles]:
+        if "Admin" not in [str(role) for role in message.author.roles]:
             print('Refused command from: ' + message.author.name)
             return False
         return True
